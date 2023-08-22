@@ -1,0 +1,237 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace july
+{
+    public partial class WebForm2 : System.Web.UI.Page
+    {
+        SqlConnection con = new SqlConnection("Data Source=LAPTOP-DRGOVH6K\\SQLEXPRESS;Initial Catalog=julyproject;User ID=sa;Password=root@123");
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+            if (!IsPostBack)
+            {
+                BinGrid();
+                Session[txtEdite.Text] = "Welcome" + txtEdite.Text;
+            }
+            
+            
+        }
+
+        protected void btninsert_Click(object sender, EventArgs e)
+        {
+            int productid = int.Parse(txtproductid.Text);
+            string productname = txtname.Text, catogary = txtCatogary.Text, discription = txtDescription.Text, Username = txtusername.Text, Edite = txtEdite.Text;
+            SqlCommand cmd = new SqlCommand("Insert_product", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            cmd.Parameters.AddWithValue("productid", productid);
+            cmd.Parameters.AddWithValue("productname", productname);            
+            cmd.Parameters.AddWithValue("catogary", catogary);
+            cmd.Parameters.AddWithValue("discription", discription);
+            cmd.Parameters.AddWithValue("Username", Username);
+            cmd.Parameters.AddWithValue("Edite", Edite);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BinGrid();
+            Clear();
+
+
+        }
+        public void Clear()
+        {
+            txtCatogary.Text = "";
+            txtDescription.Text = "";
+            txtEdite.Text = "";
+            txtname.Text = "";
+            txtusername.Text = "";
+            txtproductid.Text = "";
+
+        }
+
+        public void BinGrid()
+        {
+            SqlCommand cmd = new SqlCommand("search_product", con);
+            SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            sda.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+
+        protected void btnSelect_Click(object sender, EventArgs e)
+        {
+            int productid = int.Parse(txtproductid.Text.Trim());
+            SqlCommand cmd = new SqlCommand("Select_Product'"+ productid +"'", con);
+            SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            DataSet dt = new DataSet();
+            sda.Fill(dt);
+            if(dt.Tables.Count>0)
+            {
+                if(dt.Tables[0].Rows.Count>0)
+                {
+                    txtproductid.Text = dt.Tables[0].Rows[0]["productid"].ToString();
+                    txtCatogary.Text = dt.Tables[0].Rows[0]["catogary"].ToString();
+                    txtname.Text = dt.Tables[0].Rows[0]["productname"].ToString();
+                    txtDescription.Text = dt.Tables[0].Rows[0]["discription"].ToString();
+                    txtusername.Text = dt.Tables[0].Rows[0]["Username"].ToString();
+                    txtEdite.Text = dt.Tables[0].Rows[0]["Edite"].ToString();
+                    
+                }
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
+            }
+                
+        }
+
+        protected void btnupdate_Click(object sender, EventArgs e)
+        {
+            int productid = int.Parse(txtproductid.Text);
+            string productname = txtname.Text, catogary = txtCatogary.Text, discription = txtDescription.Text, Username = txtusername.Text, Edite = txtEdite.Text;
+            SqlCommand cmd = new SqlCommand("Update_Prodcut", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            cmd.Parameters.AddWithValue("productid", productid);
+            cmd.Parameters.AddWithValue("productname", productname);
+            cmd.Parameters.AddWithValue("catogary", catogary);
+            cmd.Parameters.AddWithValue("discription", discription);
+            cmd.Parameters.AddWithValue("Username", Username);
+            cmd.Parameters.AddWithValue("Edite", Edite);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BinGrid();
+            Clear();
+        }
+
+        protected void btndelete_Click(object sender, EventArgs e)
+        {
+            int productid = int.Parse(txtproductid.Text);
+            SqlCommand cmd = new SqlCommand("Delete_product", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            cmd.Parameters.AddWithValue("productid", productid);            
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BinGrid();
+            Clear();
+        }
+
+        protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Label productid = (Label)GridView1.Rows[GridView1.SelectedIndex].FindControl("lblid");
+            txtproductid.Text = productid.Text;
+            Label productname = (Label)GridView1.Rows[GridView1.SelectedIndex].FindControl("lblname");
+            txtname.Text = productname.Text;
+            Label catogary = (Label)GridView1.Rows[GridView1.SelectedIndex].FindControl("lblcatogary");
+            txtCatogary.Text = catogary.Text;
+            Label discription = (Label)GridView1.Rows[GridView1.SelectedIndex].FindControl("lbldescription");
+            txtDescription.Text = discription.Text;
+            Label Username = (Label)GridView1.Rows[GridView1.SelectedIndex].FindControl("lblusername");
+            txtusername.Text = Username.Text;
+            Label Edite = (Label)GridView1.Rows[GridView1.SelectedIndex].FindControl("lbledite");
+            txtEdite.Text = Edite.Text;
+        }
+
+        protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+        {
+
+            int productid = int.Parse(txtproductid.Text);
+            string productname = txtname.Text, catogary = txtCatogary.Text, discription = txtDescription.Text, Username = txtusername.Text, Edite = txtEdite.Text;
+            SqlCommand cmd = new SqlCommand("Update_Prodcut", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            cmd.Parameters.AddWithValue("productid", productid);
+            cmd.Parameters.AddWithValue("productname", productname);
+            cmd.Parameters.AddWithValue("catogary", catogary);
+            cmd.Parameters.AddWithValue("discription", discription);
+            cmd.Parameters.AddWithValue("Username", Username);
+            cmd.Parameters.AddWithValue("Edite", Edite);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BinGrid();
+            Clear();
+        }
+
+        protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+            GridView1.EditIndex = e.NewEditIndex;
+            BinGrid();
+        }
+
+        protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+            GridView1.EditIndex = -1;
+            BinGrid();
+        }
+
+        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            GridView1.PageIndex = e.NewPageIndex;
+            BinGrid();
+        }
+
+        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            int productid = int.Parse(txtproductid.Text);
+            SqlCommand cmd = new SqlCommand("Delete_product", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            cmd.Parameters.AddWithValue("productid", productid);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BinGrid();
+            Clear();
+        }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            int productid = int.Parse(txeselect.Text.Trim());
+            SqlCommand cmd = new SqlCommand("Select_Product'" + productid + "'", con);
+            SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            DataSet dt = new DataSet();
+            sda.Fill(dt);
+            if (dt.Tables.Count > 0)
+            {
+                if (dt.Tables[0].Rows.Count > 0)
+                {
+                    txeselect.Text = dt.Tables[0].Rows[0]["productid"].ToString();
+                    txtproductid.Text = dt.Tables[0].Rows[0]["productid"].ToString();
+                    txtCatogary.Text = dt.Tables[0].Rows[0]["catogary"].ToString();
+                    txtname.Text = dt.Tables[0].Rows[0]["productname"].ToString();
+                    txtDescription.Text = dt.Tables[0].Rows[0]["discription"].ToString();
+                    txtusername.Text = dt.Tables[0].Rows[0]["Username"].ToString();
+                    txtEdite.Text = dt.Tables[0].Rows[0]["Edite"].ToString();
+
+                }
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
+            }
+
+        }
+
+        protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            string productid = txtproductid.Text;
+            string productname = txtname.Text, catogary = txtCatogary.Text, discription = txtDescription.Text, Username = txtusername.Text, Edite = txtEdite.Text;
+            SqlCommand cmd = new SqlCommand("Update_Prodcut", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+            cmd.Parameters.AddWithValue("productid", productid);
+            cmd.Parameters.AddWithValue("productname", productname);
+            cmd.Parameters.AddWithValue("catogary", catogary);
+            cmd.Parameters.AddWithValue("discription", discription);
+            cmd.Parameters.AddWithValue("Username", Username);
+            cmd.Parameters.AddWithValue("Edite", Edite);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            BinGrid();
+            Clear();
+        }
+    }
+}
